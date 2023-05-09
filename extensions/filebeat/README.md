@@ -1,3 +1,4 @@
+This is all new repo boilerplate documentation. There is nothing specific to NCI in here. See the root readme for more info.
 # Filebeat
 
 Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers,

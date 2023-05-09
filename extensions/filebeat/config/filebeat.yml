@@ -9,31 +9,59 @@ filebeat.config:
     path: ${path.config}/modules.d/*.yml
     reload.enabled: false
 
-filebeat.autodiscover:
-  providers:
-    # The Docker autodiscover provider automatically retrieves logs from Docker
-    # containers as they start and stop.
-    - type: docker
-      hints.enabled: true
+#filebeat.autodiscover:
+#  providers:
+#    # The Docker autodiscover provider automatically retrieves logs from Docker
+#    # containers as they start and stop.
+#    - type: docker
+#      hints.enabled: true
 
-processors:
-  - add_cloud_metadata: ~
+#processors:
+#  - add_cloud_metadata: ~
 
-monitoring:
-  enabled: true
-  elasticsearch:
-    username: beats_system
-    password: ${BEATS_SYSTEM_PASSWORD}
-
-output.elasticsearch:
-  hosts: [ http://elasticsearch:9200 ]
-  username: filebeat_internal
-  password: ${FILEBEAT_INTERNAL_PASSWORD}
+## Monitoring requires elasticsearch
+#monitoring:
+#  enabled: true
+#  elasticsearch:
+#    username: beats_system
+#    password: ${BEATS_SYSTEM_PASSWORD}
 
 ## HTTP endpoint for health checking
 ## https://www.elastic.co/guide/en/beats/filebeat/current/http-endpoint.html
 #
+filebeat.inputs:
+- type: filestream
+  id: web3322-apache
+  paths:
+    - "/logdata/web-3322/access/*"
+  fields:
+    service.node.name: web-3322
+    service.type: apache
+    event.dataset: apache.access
+    event.kind: event
+    event.type: web
+  fields_under_root: true
+- type: filestream
+  id: web3323-apache
+  paths:
+    - "/logdata/web-3323/access/*"
+  fields:
+    service.node.name: web-3323
+    service.type: apache
+    event.dataset: apache.access
+    event.kind: event
+    event.type: web
+  fields_under_root: true
 
 http:
   enabled: true
   host: 0.0.0.0
+
+## We don't want to sent to elasticsearch but logstash for processing.
+#output.elasticsearch:
+#  hosts: [ http://elasticsearch:9200 ]
+#  username: filebeat_internal
+#  password: ${FILEBEAT_INTERNAL_PASSWORD}
+
+output.logstash:
+  hosts: [ logstash:5044 ]

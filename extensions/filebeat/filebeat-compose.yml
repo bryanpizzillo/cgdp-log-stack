@@ -17,7 +17,9 @@ services:
       # see: https://www.elastic.co/guide/en/beats/libbeat/current/config-file-permissions.html
       - --strict.perms=false
     volumes:
+      # Volume paths are relative to where the docker compose command is run from.
       - ./extensions/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro,Z
+      - ./data/2023-april:/logdata
       - type: bind
         source: /var/lib/docker/containers
         target: /var/lib/docker/containers

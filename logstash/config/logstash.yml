@@ -5,3 +5,7 @@
 http.host: 0.0.0.0
 
 node.name: logstash
+
+dead_letter_queue.enable: true
+
+log.level: info

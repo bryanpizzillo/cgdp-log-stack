@@ -1,3 +1,26 @@
+# NCI NOTES
+
+## Running this
+1. Setup passwords in .env file. Just copy `.env.sample` to `.env` if you are going to run it locally.
+   * These will automatically get added to ES and the other tools if the password is not empty.
+2. Go to `./extensions/filebeat/filebeat-compose.yml` and configure what data folder to mount as the log input (`/logdata`).
+   * The expected folder structure for the access logs is `/logdata/<server_name>/access/access.log-YYYYMMDD` where `<server_name>` is something like `web-3322` or `web-3323`.
+   * The purpose for each directory can be seen in `extensions/filebeat/config/filebeat.yml`.
+2. Run with `docker-compose -f ./docker-compose.yml -f ./extensions/filebeat/filebeat-compose.yml`
+   * You need to be in the `<reporoot>` directory to run this
+   * I made a `dc.sh` command to wrap the docker compose comands with the correct configs passed in.
+   * Note that in any docs below, `docker-elk_` will be the name of your folder instead. (e.g., `cgdp-log-stack_`) This is how compose names its resources.
+
+## Other notes
+* [Grok Patterns for Reference](https://github.com/logstash-plugins/logstash-patterns-core/tree/main/patterns/ecs-v1)
+* When using Filebeats -> Logstash -> Elastic, Filebeats will not create the index template for you. When using the elastic output, filebeats will use its fields.yml file to create the index templates. So what you can do is to run `filebeats export template > template.json` inside of the filebeats container. That will export the template. You can then add your own elements to the template to help control the schema. (For example, using `flattened` types to keep memory in check.) With your template.json you can edit the logstash.config and configure the elasticsearch output to use the template.
+  * Ok, so this crap does not work at all. When you want to set the template all the data_stream stuff breaks, including the nice naming and rotation and everything. TBH, it sounds like life is slightly easier if Filebeats goes directly into ES, but then we have all sorts of other issues. (Like not being able to process anything)
+  * So we are just avoiding this for now and hope query param parsing does not kill the memory.
+
+--------------------------
+
+Every thing here is the boilerplate documentation content.
+
 # Elastic stack (ELK) on Docker
 
 [![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.6.2-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
